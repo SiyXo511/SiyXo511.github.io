@@ -1,16 +1,8 @@
 ---
-// 这里是“组件脚本”区：在构建时运行，可以写任意 JS/TS
-const title = '我的博客';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-  </head>
-  <body>
-    <h1>{title}</h1>
-    <p>这里会展示我的经历、随笔和知识笔记。</p>
-  </body>
-</html>
+<BaseLayout title="我的博客">
+  <h1>我的博客</h1>
+  <p>这里会展示我的经历、随笔和知识笔记。</p>
+</BaseLayout>
