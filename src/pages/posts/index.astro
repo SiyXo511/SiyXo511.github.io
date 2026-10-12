@@ -1,0 +1,29 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// 决定列表里显示哪些文章、按什么顺序显示
+function selectPosts(all: CollectionEntry<'posts'>[]): CollectionEntry<'posts'>[] {
+  const published = all.filter((post) => !post.data.draft);
+  return published.sort((a, b) => b.data.createdAt.valueOf() - a.data.createdAt.valueOf());
+}
+
+const posts = selectPosts(await getCollection('posts'));
+---
+
+<BaseLayout title="文章">
+  <h1>文章</h1>
+  <ul>
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/posts/${post.id}`}>{post.data.title}</a>
+          <span>[{post.data.category}]</span>
+          <time datetime={post.data.createdAt.toISOString()}>
+            {post.data.createdAt.toLocaleDateString('zh-CN')}
+          </time>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
