@@ -1,8 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+import { getPublishedPosts } from '../lib/posts';
+
+// 首页显示最新的几篇文章
+const LATEST_COUNT = 5;
+const allPosts = await getPublishedPosts();
 ---
 
 <BaseLayout title="我的博客">
-  <h1>我的博客</h1>
-  <p>这里会展示我的经历、随笔和知识笔记。</p>
+  <section class="intro">
+    <h1>你好 👋</h1>
+    <p>这里是小莳的博客，是一枚喜欢睡觉的🐷</p>
+    <p>这里会展示我的经历、随笔和知识笔记。</p>
+  </section>
+
+  <section>
+    <h2>最新文章</h2>
+    <PostList posts={allPosts.slice(0, LATEST_COUNT)} />
+    { allPosts.length > LATEST_COUNT && <p class="more"><a href="/posts">查看全部文章 →</a></p> }
+  </section>
 </BaseLayout>
+
+<style>
+  .intro {
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+
+  .more {
+    text-align: right;
+    font-size: 0.875rem;
+  }
+</style>

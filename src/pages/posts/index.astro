@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostMeta from '../../components/PostMeta.astro';
+import PostList from '../../components/PostList.astro';
 import { getPublishedPosts } from '../../lib/posts';
 
 const posts = await getPublishedPosts();
@@ -8,49 +8,5 @@ const posts = await getPublishedPosts();
 
 <BaseLayout title="文章">
   <h1>文章</h1>
-  <ul class="post-list">
-    {
-      posts.map((post) => (
-        <li>
-          <a class="title" href={`/posts/${post.id}`}>{post.data.title}</a>
-          {post.data.description && <p class="description">{post.data.description}</p>}
-          <PostMeta
-            category={post.data.category}
-            createdAt={post.data.createdAt}
-            updatedAt={post.data.updatedAt}
-            tags={post.data.tags}
-          />
-        </li>
-      ))
-    }
-  </ul>
+  <PostList posts={posts} />
 </BaseLayout>
-
-<style>
-  .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .post-list li {
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .title:hover {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .description {
-    margin: 0.25rem 0;
-    color: var(--color-muted);
-  }
-</style>
