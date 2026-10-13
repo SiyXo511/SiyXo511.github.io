@@ -1,0 +1,50 @@
+---
+// 文章元信息：[分类] 日期 · 更新日期 · 标签
+// 列表页和详情页共用，保证两边格式一致
+interface Props {
+  category: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  tags?: string[];
+}
+
+const { category, createdAt, updatedAt, tags = [] } = Astro.props;
+
+// 把日期转成页面上显示的文字
+function formatDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+---
+
+<div class="meta">
+  <span class="category">[{category}]</span>
+  <time datetime={createdAt.toISOString()}>{formatDate(createdAt)}</time>
+  {
+    updatedAt && (
+      <span>
+        更新于 <time datetime={updatedAt.toISOString()}>{formatDate(updatedAt)}</time>
+      </span>
+    )
+  }
+  {tags.map((tag) => <code class="tag">{tag}</code>)}
+</div>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .category {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+  }
+
+  time {
+    font-family: var(--font-mono);
+  }
+</style>

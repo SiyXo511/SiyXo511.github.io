@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
 
 // 构建时告诉 Astro：要为哪些文章各生成一个页面
 export async function getStaticPaths() {
@@ -24,14 +25,7 @@ const { Content } = await render(post);
 <BaseLayout title={title}>
   <article>
     <h1>{title}</h1>
-    <p>
-      {category}·
-      <time datetime={createdAt.toISOString()}>
-        {createdAt.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </time>·
-      {updatedAt && <span>更新于 {updatedAt.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>}
-      {tags.map((tag) => <span>{tag}</span>)}
-    </p>
+    <PostMeta category={category} createdAt={createdAt} updatedAt={updatedAt} tags={tags} />
     <Content />
   </article>
 </BaseLayout>
