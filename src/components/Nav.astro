@@ -6,8 +6,59 @@ const links: { href: string; label: string }[] = [
   { href: '/posts', label: '文章' },
   { href: '/about', label: '关于' }
 ];
+
+// 当前页面的路径，例如 '/posts/hello-world'
+const currentPath = Astro.url.pathname;
+
+// 判断某个导航项是否对应当前页面，用来高亮
+function isActive(href: string): boolean {
+  if(href === '/') {
+    return href === currentPath;
+  } else {
+    return currentPath === href || currentPath.startsWith(href + '/');
+  }
+}
 ---
 
-<nav>
-  {links.map((link) => <a href={link.href}>{link.label}</a>)}
-</nav>
+<header>
+  <a class="brand" href="/">~/blog</a>
+  <nav>
+    {
+      links.map((link) => (
+        <a href={link.href} class:list={{ active: isActive(link.href) }}>
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .brand {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  nav a {
+    color: var(--color-muted);
+  }
+
+  nav a.active {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+</style>
