@@ -1,0 +1,44 @@
+---
+// 深浅色切换按钮：点击后在 <html> 上设置 data-theme，并记到 localStorage
+// global.css 根据 data-theme 切换颜色变量
+---
+
+<button id="theme-toggle" type="button" aria-label="切换深浅色" title="切换深浅色">◐</button>
+
+<script>
+  const button = document.getElementById('theme-toggle');
+
+  // 当前页面实际显示的是哪种主题
+  function currentTheme(): 'light' | 'dark' {
+    const manual = document.documentElement.dataset.theme;
+    if(manual === 'dark' || manual === 'light'){
+      return manual;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  button?.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // 隐私模式等情况下 localStorage 可能不可用，此时只是不记住选择
+    }
+  });
+</script>
+
+<style>
+  button {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: var(--color-accent);
+  }
+</style>
