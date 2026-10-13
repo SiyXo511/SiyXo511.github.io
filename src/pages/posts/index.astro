@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
 
 // 决定列表里显示哪些文章、按什么顺序显示
 function selectPosts(all: CollectionEntry<'posts'>[]): CollectionEntry<'posts'>[] {
@@ -13,17 +14,49 @@ const posts = selectPosts(await getCollection('posts'));
 
 <BaseLayout title="文章">
   <h1>文章</h1>
-  <ul>
+  <ul class="post-list">
     {
       posts.map((post) => (
         <li>
-          <a href={`/posts/${post.id}`}>{post.data.title}</a>
-          <span>[{post.data.category}]</span>
-          <time datetime={post.data.createdAt.toISOString()}>
-            {post.data.createdAt.toLocaleDateString('zh-CN')}
-          </time>
+          <a class="title" href={`/posts/${post.id}`}>{post.data.title}</a>
+          {post.data.description && <p class="description">{post.data.description}</p>}
+          <PostMeta
+            category={post.data.category}
+            createdAt={post.data.createdAt}
+            updatedAt={post.data.updatedAt}
+            tags={post.data.tags}
+          />
         </li>
       ))
     }
   </ul>
 </BaseLayout>
+
+<style>
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .title:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .description {
+    margin: 0.25rem 0;
+    color: var(--color-muted);
+  }
+</style>
