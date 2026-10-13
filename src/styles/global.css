@@ -1,0 +1,84 @@
+/* ========== 颜色变量 ==========
+   所有颜色都从这里取，深色模式只需要替换这些变量 */
+:root {
+  --color-bg: #f8fafc;
+  --color-text: #1e293b;
+  --color-muted: #64748b; /* 次要文字：日期、分类等 */
+  --color-border: #e2e8f0;
+  --color-accent: #0d9488; /* 青绿强调色：链接、标识 */
+  --color-code-bg: #eef2f6;
+
+  --font-sans: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --content-width: 42rem;
+
+  color-scheme: light;
+}
+
+/* 深色：系统是深色、且用户没有手动选浅色时 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #0f172a;
+    --color-text: #e2e8f0;
+    --color-muted: #94a3b8;
+    --color-border: #1e293b;
+    --color-accent: #2dd4bf;
+    --color-code-bg: #1e293b;
+
+    color-scheme: dark;
+  }
+}
+
+/* 深色：用户手动选了深色（S4 的切换按钮会设置 data-theme） */
+:root[data-theme='dark'] {
+  --color-bg: #0f172a;
+  --color-text: #e2e8f0;
+  --color-muted: #94a3b8;
+  --color-border: #1e293b;
+  --color-accent: #2dd4bf;
+  --color-code-bg: #1e293b;
+
+  color-scheme: dark;
+}
+
+/* ========== 基础排版 ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: var(--content-width);
+  padding: 2rem 1rem;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-code-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
