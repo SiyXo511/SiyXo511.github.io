@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostList from '../components/PostList.astro';
+import SocialLinks from '../components/SocialLinks.astro';
 import { getPublishedPosts } from '../lib/posts';
 
 // 首页显示最新的几篇文章
@@ -16,6 +17,7 @@ const allPosts = await getPublishedPosts();
       <h1>小莳</h1>
       <p class="tagline">一枚喜欢睡觉的🐷</p>
       <p class="bio">这里会展示我的经历、随笔和知识笔记。</p>
+      <SocialLinks />
     </div>
   </section>
 
@@ -74,6 +76,11 @@ const allPosts = await getPublishedPosts();
     .hero {
       flex-direction: column;
       text-align: center;
+    }
+
+    /* SocialLinks 是子组件，它的 class 带的是自己的作用域，要用 :global() 才能从这里选中 */
+    .hero :global(.social) {
+      justify-content: center;
     }
   }
 
