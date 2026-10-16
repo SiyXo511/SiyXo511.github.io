@@ -9,10 +9,14 @@ const allPosts = await getPublishedPosts();
 ---
 
 <BaseLayout title="我的博客">
-  <section class="intro">
-    <h1>你好 👋</h1>
-    <p>这里是小莳的博客，是一枚喜欢睡觉的🐷</p>
-    <p>这里会展示我的经历、随笔和知识笔记。</p>
+  <section class="hero">
+    <!-- 头像：暂时用 emoji，以后可以换成 <img> -->
+    <div class="avatar" aria-hidden="true">🐷</div>
+    <div>
+      <h1>小莳</h1>
+      <p class="tagline">一枚喜欢睡觉的🐷</p>
+      <p class="bio">这里会展示我的经历、随笔和知识笔记。</p>
+    </div>
   </section>
 
   <section>
@@ -23,8 +27,54 @@ const allPosts = await getPublishedPosts();
 </BaseLayout>
 
 <style>
-  .intro {
-    margin-bottom: 2.5rem;
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1rem 0 3rem;
+  }
+
+  .avatar {
+    flex-shrink: 0; /* 名字很长时也不要把头像挤扁 */
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    font-size: 3rem;
+    border-radius: 50%;
+    background: var(--color-code-bg);
+    /* 外圈用强调色描一道细环 */
+    box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-accent);
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  .tagline {
+    margin: 0.25rem 0;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+  }
+
+  /* 终端提示符：纯装饰，用伪元素加，不进入正文内容 */
+  .tagline::before {
+    content: '$ ';
+    color: var(--color-muted);
+  }
+
+  .bio {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  /* 手机上改成上下排列 */
+  @media (max-width: 480px) {
+    .hero {
+      flex-direction: column;
+      text-align: center;
+    }
   }
 
   h2 {
