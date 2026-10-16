@@ -97,15 +97,15 @@ for (const pageFile of 扫描('src/pages')) {          // 找到 posts/[id].astr
 
 ## 后台管理
 
-为了可以发布、修改以及删除文章，我使用了一个CMS搭建了一个后台。首先介绍一下CMS(Content Management System，即内容管理系统)，简单来说CMS就是不用写代码也能管理网站内容的后台，CMS有两类，一类是像WordPress这种的传统CMS，他们的内容保存在服务器的数据库上，需要服务器时刻运行；另一类是像Sveltia这种的Git-based CMS，他们的内容就是仓库的.md文件，使用git来追踪管理，只需要挂个路径展示内容就可以了，当内容修改时git会重新构建来更新网站。这里我使用的Sveltia CMS作为我的后台，就博客而言已经足够使用了，而且github pages也不能运行服务器。
+为了可以发布、修改以及删除文章，我使用了一个CMS搭建了一个后台。首先介绍一下CMS(Content Management System，即内容管理系统)，简单来说CMS就是不用写代码也能管理网站内容的后台，CMS有两类，一类是像WordPress这种的传统CMS，他们的内容保存在服务器的数据库上，需要服务器时刻运行；另一类是像Sveltia这种的Git-based CMS，他们的内容就是仓库的.md文件，使用git来追踪管理，后台管理页面本质上也是一个静态页面，放在网站的某个路径下就可以使用，当内容修改时通过github api推送到github，github action会重新构建并部署。因为github pages也不能运行服务器，这里我使用的Sveltia CMS作为我的后台，就博客而言已经足够使用了。
 
 具体接入需要三步：
 
-1. 需要一个index.html的页面
-2. 提供config.yml，config.yml需要与astro保持相同的schema，方便生成表单供astro进行下一步校验
-3. 获取github access token，在[https://github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)中填入过期时间、对应的博客仓库和Content的Read和Write权限获取密钥。然后打开后台填入后进入后台页面。
+1. 需要一个index.html的页面，可以放在/public/admin下，文件只引入sveltia的脚本。放在/public是因为astro会原样复制这里的文件，不会套上博客的样式。
+2. 提供config.yml，config.yml需要与astro保持相同的schema，因为sveltia会根据config.yml生成表单，如果不一致会导致astro在构建时校验失败。
+3. 获取github access token，在[https://github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)中填入过期时间、对应的博客仓库和Contents的Read和Write权限获取token。然后打开后台填入后进入后台页面。
 
-
+> 不要在公共电脑登录这个token，因为它保存在浏览器中
 
 ## 小巧思
 
