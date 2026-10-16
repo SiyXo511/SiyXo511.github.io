@@ -1,0 +1,38 @@
+# Sveltia CMS 配置：字段要和 src/content.config.ts 里的 schema 一一对应
+backend:
+  name: github
+  repo: SiyXo511/SiyXo511.github.io
+  branch: main
+  commit_messages:
+    create: '新建文章：{{slug}}'
+    update: '更新文章：{{slug}}'
+    delete: '删除文章：{{slug}}'
+
+# 上传的图片存到 public/images，文章里用 /images/xxx.png 引用
+media_folder: /public/images
+public_folder: /images
+
+output:
+  # 选填字段留空时不写入文件，否则会写成 '' 导致 z.coerce.date() 校验失败
+  omit_empty_optional_fields: true
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    folder: /src/content/posts
+    create: true
+    # 文件名就是网址（/posts/xxx），新建时手动填写英文名，不从中文标题生成
+    slug:
+      editable: true
+      hint: 英文小写，用 - 连接，例如 astro-blog-principles
+      pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', '只能包含小写字母、数字和 -']
+    fields:
+      - { name: title, label: 标题, widget: string }
+      - { name: category, label: 分类, widget: select, options: [随笔, 笔记] }
+      - { name: description, label: 简介, widget: string, required: false }
+      - { name: createdAt, label: 创建日期, widget: datetime, type: date, picker_utc: true }
+      - { name: updatedAt, label: 更新日期, widget: datetime, type: date, picker_utc: true, required: false }
+      - { name: tags, label: 标签, widget: list, required: false }
+      - { name: draft, label: 是否草稿, widget: boolean, default: false }
+      - { name: body, label: 正文, widget: markdown }
