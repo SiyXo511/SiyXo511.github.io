@@ -4,6 +4,7 @@
 const links = [
   { name: 'GitHub', href: 'https://github.com/SiyXo511', icon: 'github', external: true },
   { name: '邮箱', href: 'mailto:siyxo512@gmail.com', icon: 'mail', external: false },
+  { name: 'RSS', href: '/rss.xml', icon: 'rss', external: false },
 ];
 ---
 
@@ -28,6 +29,13 @@ const links = [
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          )}
+          {link.icon === 'rss' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 11a9 9 0 0 1 9 9" />
+              <path d="M4 4a16 16 0 0 1 16 16" />
+              <circle cx="5" cy="19" r="1" />
             </svg>
           )}
           <span>{link.name}</span>
