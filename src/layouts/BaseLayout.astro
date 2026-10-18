@@ -1,6 +1,7 @@
 ---
 // 每个页面共用的外壳：<html>、<head> 都在这里，页面只需要关心自己的内容
 import Nav from '../components/Nav.astro';
+import SakuraFall from '../components/SakuraFall.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -28,6 +29,7 @@ const { title } = Astro.props;
     </script>
   </head>
   <body>
+    <SakuraFall />
     <Nav />
     <slot />
   </body>
