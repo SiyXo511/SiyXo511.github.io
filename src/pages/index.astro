@@ -15,7 +15,11 @@ const allPosts = await getPublishedPosts();
     <div class="avatar" aria-hidden="true">🐷</div>
     <div>
       <h1>小莳</h1>
-      <p class="tagline">一枚喜欢睡觉的🐷</p>
+      <p class="tagline">
+        <!-- 读屏软件读这一份完整文字；下面逐字变化的那份对它隐藏，避免被念成一个个零碎的字 -->
+        <span class="sr-only">一枚喜欢睡觉的🐷</span>
+        <span class="typed" aria-hidden="true">一枚喜欢睡觉的🐷</span><span class="cursor" aria-hidden="true"></span>
+      </p>
       <p class="bio">这里会展示我的经历、随笔和知识笔记。</p>
       <SocialLinks />
     </div>
@@ -66,6 +70,41 @@ const allPosts = await getPublishedPosts();
     color: var(--color-muted);
   }
 
+  /* 终端风格的块状光标，一亮一灭 */
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.1em;
+    margin-left: 0.1em;
+    vertical-align: text-bottom;
+    background: var(--color-accent);
+    animation: blink 1s step-end infinite;
+  }
+
+  /* step-end：不渐变，直接在亮和灭之间跳，更像真实的终端光标 */
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* 视觉上隐藏、但读屏软件能读到的常用写法 */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* 用户在系统里开启了"减少动态效果"时，光标也不闪 */
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+
   .bio {
     margin: 0;
     color: var(--color-muted);
@@ -95,3 +134,25 @@ const allPosts = await getPublishedPosts();
     font-size: 0.875rem;
   }
 </style>
+
+<script>
+  // 打字效果：HTML 里已经有完整文字（没有 JS 时也能看到），JS 先清空，再一个字一个字打出来
+  const typed = document.querySelector<HTMLElement>('.typed');
+  // 系统开启了"减少动态效果"，就直接显示完整文字
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (typed && !reduceMotion) {
+    const text = typed.textContent ?? '';
+    typed.textContent = '';
+    const chars = Array.from(text);
+    let count = 0;
+    const timer = setInterval(() => {
+      if (count >= chars.length) {
+        clearInterval(timer);
+        return;
+      }
+      typed.textContent += chars[count];
+      count++;
+    }, 500);
+  }
+</script>
