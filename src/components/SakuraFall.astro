@@ -13,6 +13,11 @@
     z-index: -1; /* 垫在页面内容下面，花瓣不会挡住文字 */
     pointer-events: none; /* 鼠标事件直接穿透，不影响点击链接 */
   }
+
+  /* 读者关掉了樱花：<html> 不在这个组件里，所以要用 :global() */
+  :global(html[data-sakura='off']) #sakura {
+    display: none;
+  }
 </style>
 
 <script>
@@ -93,10 +98,13 @@
       const dt = Math.min((now - last) / (1000 / 60), 3);
       last = now;
 
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      for (const p of petals) {
-        updatePetal(p, dt);
-        drawPetal(ctx, p);
+      // 关闭时跳过计算和绘制（canvas 已经被 CSS 隐藏），只保留一个很轻的循环等待重新打开
+      if (document.documentElement.dataset.sakura !== 'off') {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        for (const p of petals) {
+          updatePetal(p, dt);
+          drawPetal(ctx, p);
+        }
       }
       requestAnimationFrame(frame);
     };

@@ -25,6 +25,10 @@ const { title } = Astro.props;
         if (saved === 'light' || saved === 'dark') {
           document.documentElement.dataset.theme = saved;
         }
+        // 樱花开关同理：关掉过的读者，刷新时不会先闪出花瓣
+        if (localStorage.getItem('sakura') === 'off') {
+          document.documentElement.dataset.sakura = 'off';
+        }
       } catch {}
     </script>
   </head>

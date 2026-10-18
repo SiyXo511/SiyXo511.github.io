@@ -1,0 +1,50 @@
+---
+// 樱花开关：点击后在 <html> 上设置或移除 data-sakura="off"，并记到 localStorage
+// SakuraFall 根据 data-sakura 决定是否显示、是否继续绘制
+---
+
+<button id="sakura-toggle" type="button" aria-label="樱花飘落" title="樱花飘落" aria-pressed="true">🌸</button>
+
+<script>
+
+  const button = document.getElementById('sakura-toggle');
+  const root = document.documentElement;
+
+  // 页面刚加载时，按钮状态要和 <head> 里恢复出来的设置保持一致
+  button?.setAttribute('aria-pressed', String(root.dataset.sakura !== 'off'));
+
+  button?.addEventListener('click', () => {
+    if(root.dataset.sakura === 'off') {
+      delete root.dataset.sakura;
+    } else {
+      root.dataset.sakura = 'off';
+    }
+    button.setAttribute('aria-pressed', root.dataset.sakura ? 'false' : 'true');
+    try {
+      if(root.dataset.sakura === 'off') {
+        localStorage.setItem('sakura', root.dataset.sakura);
+      } else {
+        localStorage.removeItem('sakura');
+      }
+    } catch {
+      // 隐私模式等情况下 localStorage 可能不可用，此时只是不记住选择
+    }
+  });
+</script>
+
+<style>
+  button {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+    transition: filter 0.2s, opacity 0.2s;
+  }
+
+  /* 关闭时变成灰色、半透明，一眼能看出状态 */
+  button[aria-pressed='false'] {
+    filter: grayscale(1);
+    opacity: 0.5;
+  }
+</style>

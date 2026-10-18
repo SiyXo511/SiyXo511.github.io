@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import SakuraToggle from './SakuraToggle.astro';
 
 // 站点导航：每一项是一个 { href, label }
 // href 是网址路径（对应 src/pages/ 下的文件），label 是显示的文字
@@ -32,6 +33,7 @@ function isActive(href: string): boolean {
         </a>
       ))
     }
+    <SakuraToggle />
     <ThemeToggle />
   </nav>
 </header>
