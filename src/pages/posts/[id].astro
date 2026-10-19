@@ -3,6 +3,8 @@ import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostMeta from '../../components/PostMeta.astro';
 import { getPublishedPosts, type Post } from '../../lib/posts';
+// 公式的排版样式和字体：只有文章页需要，所以在这里引入，不放进全站的 global.css
+import 'katex/dist/katex.min.css';
 
 // 构建时告诉 Astro：要为哪些文章各生成一个页面
 export async function getStaticPaths() {
@@ -39,5 +41,34 @@ const { Content } = await render(post);
     height: auto; /* 宽度被缩小时，高度按比例跟着缩，不变形 */
     margin: 1.5rem auto;
     border-radius: 0.5rem;
+  }
+</style>
+
+<style>
+  /* 引用块：> 开头的段落，常用来放提示、结论、补充说明 */
+  /* 左边一道强调色竖线 + 浅色底，像一张提示卡片；颜色都用变量，深浅主题自动跟着变 */
+  article :global(blockquote) {
+    margin: 1.5rem 0; /* 去掉浏览器默认的左右缩进，和正文左边对齐 */
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--color-accent);
+    border-radius: 0 0.5rem 0.5rem 0; /* 只圆右边两个角，左边贴着竖线保持方正 */
+    background: var(--color-code-bg);
+    color: var(--color-muted);
+  }
+
+  /* 引用块里第一段的上边距也去掉，和上面的 :last-child 对称 */
+  article :global(blockquote > :first-child) {
+    margin-top: 0;
+  }
+
+  /* 引用块里最后一段不要再带下边距，否则底部会比顶部多出一截空白 */
+  article :global(blockquote > :last-child) {
+    margin-bottom: 0;
+  }
+
+  /* 独占一行的长公式在手机上可能比屏幕宽：让公式自己横向滚动，而不是撑破整个页面 */
+  article :global(.katex-display) {
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 </style>
