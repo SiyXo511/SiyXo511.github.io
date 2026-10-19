@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostMeta from '../../components/PostMeta.astro';
+import CodeCopy from '../../components/CodeCopy.astro';
 import { getPublishedPosts, type Post } from '../../lib/posts';
 // 公式的排版样式和字体：只有文章页需要，所以在这里引入，不放进全站的 global.css
 import 'katex/dist/katex.min.css';
@@ -31,6 +32,7 @@ const { Content } = await render(post);
     <PostMeta category={category} createdAt={createdAt} updatedAt={updatedAt} tags={tags} />
     <Content />
   </article>
+  <CodeCopy />
 </BaseLayout>
 
 <style>

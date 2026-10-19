@@ -1,0 +1,71 @@
+---
+// 给文章里每个代码块右上角加一个"复制"按钮
+// 按钮由脚本动态加上：没有 JS 时根本不出现，不会留下一个点了没反应的按钮
+---
+
+<script>
+
+  // 点击复制按钮：把代码复制到剪贴板，并在按钮上提示结果
+  async function copyCode(button: HTMLButtonElement, code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      button.textContent = '已复制';
+    } catch {
+      button.textContent = '复制失败';
+    }
+    setTimeout(() => {
+      button.textContent = '复制';
+    }, 2000);
+  }
+
+  for (const pre of document.querySelectorAll<HTMLPreElement>('pre.astro-code')) {
+    // 包一层容器，按钮放在容器上而不是 pre 里：pre 横向滚动时，按钮不会跟着滚走
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.replaceWith(wrapper);
+    wrapper.append(pre);
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-button';
+    button.textContent = '复制';
+    // 只复制代码文字本身：textContent 会去掉所有高亮用的 <span>
+    button.addEventListener('click', () => copyCode(button, pre.textContent ?? ''));
+    wrapper.append(button);
+  }
+</script>
+
+<style is:global>
+  /* 按钮和容器都是脚本创建的，不带组件的作用域标记，所以这里用全局样式 */
+  .code-block {
+    position: relative; /* 让按钮以代码块为参照定位 */
+  }
+
+  .copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    background: var(--color-bg);
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0; /* 平时隐藏，鼠标移到代码块上才出现，不挡代码 */
+    transition: opacity 0.2s;
+  }
+
+  .code-block:hover .copy-button,
+  .copy-button:focus-visible {
+    opacity: 1;
+  }
+
+  /* 触屏设备没有"鼠标悬停"，按钮一直显示 */
+  @media (hover: none) {
+    .copy-button {
+      opacity: 1;
+    }
+  }
+</style>
