@@ -1,0 +1,46 @@
+---
+// 单个栏目页：/columns/leetcode 这样的网址，列出这个栏目下的全部文章
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getPublishedPosts, type Post } from '../../lib/posts';
+
+// 构建时告诉 Astro：要为哪些栏目各生成一个页面，每个页面拿到什么数据
+export async function getStaticPaths() {
+  const columns = await getCollection('columns');
+  const posts = await getPublishedPosts();
+
+  return columns.map((column) => ({
+    params: { id: column.id },
+    props: {
+      column,
+      posts: posts.filter((post) => post.data.column?.id === column.id),
+    },
+  }));
+}
+
+interface Props {
+  column: CollectionEntry<'columns'>;
+  posts: Post[];
+}
+
+const { column, posts } = Astro.props;
+---
+
+<BaseLayout title={column.data.title}>
+  <p class="back"><a href="/columns">← 全部栏目</a></p>
+  <h1>{column.data.title}</h1>
+  {column.data.description && <p class="description">{column.data.description}</p>}
+  {posts.length > 0 ? <PostList posts={posts} /> : <p class="empty">这个栏目还没有文章。</p>}
+</BaseLayout>
+
+<style>
+  .back {
+    font-size: 0.875rem;
+  }
+
+  .description,
+  .empty {
+    color: var(--color-muted);
+  }
+</style>

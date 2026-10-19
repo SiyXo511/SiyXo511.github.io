@@ -1,0 +1,71 @@
+---
+// 栏目总览：列出所有栏目，以及每个栏目下有几篇已发布的文章
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+const columns = await getCollection('columns');
+const posts = await getPublishedPosts();
+
+// 数一数某个栏目下有几篇文章；post.data.column 是 { collection, id }，比较的是 id
+function countPosts(columnId: string): number {
+  return posts.filter((post) => post.data.column?.id === columnId).length;
+}
+---
+
+<BaseLayout title="栏目">
+  <h1>栏目</h1>
+  <ul class="columns">
+    {
+      columns.map((column) => (
+        <li>
+          <a href={`/columns/${column.id}`}>
+            <span class="title">{column.data.title}</span>
+            <span class="count">{countPosts(column.id)} 篇</span>
+          </a>
+          {column.data.description && <p class="description">{column.data.description}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .columns {
+    display: grid;
+    /* 每张卡片至少 14rem 宽，放得下就并排，放不下自动换行，手机上就是一列 */
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .columns li {
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+  }
+
+  .columns a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .count {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .description {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted);
+  }
+</style>
