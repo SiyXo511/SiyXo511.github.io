@@ -30,3 +30,14 @@ const { Content } = await render(post);
     <Content />
   </article>
 </BaseLayout>
+
+<style>
+  /* 正文是 <Content /> 渲染出来的，不带本组件的作用域标记，所以要用 :global() 才能选中里面的元素 */
+  article :global(img) {
+    display: block; /* 默认是行内元素，底部会留一条基线空隙 */
+    max-width: 100%; /* 最宽不超过正文区，小图保持原尺寸 */
+    height: auto; /* 宽度被缩小时，高度按比例跟着缩，不变形 */
+    margin: 1.5rem auto;
+    border-radius: 0.5rem;
+  }
+</style>
