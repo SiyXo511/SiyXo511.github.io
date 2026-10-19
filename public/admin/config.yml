@@ -3,10 +3,11 @@ backend:
   name: github
   repo: SiyXo511/SiyXo511.github.io
   branch: main
+  # {{collection}} 会替换成集合的 label_singular（文章 / 栏目）
   commit_messages:
-    create: '新建文章：{{slug}}'
-    update: '更新文章：{{slug}}'
-    delete: '删除文章：{{slug}}'
+    create: '新建{{collection}}：{{slug}}'
+    update: '更新{{collection}}：{{slug}}'
+    delete: '删除{{collection}}：{{slug}}'
 
 # 上传的图片存到 public/images，文章里用 /images/xxx.png 引用
 media_folder: /public/images
@@ -30,9 +31,27 @@ collections:
     fields:
       - { name: title, label: 标题, widget: string }
       - { name: category, label: 分类, widget: select, options: [随笔, 笔记] }
+      # 从下面的"栏目"集合里选，存的是栏目的文件名（例如 leetcode），不用在这里再写一遍栏目列表
+      - { name: column, label: 栏目, widget: relation, collection: columns, display_fields: [title], search_fields: [title], required: false }
       - { name: description, label: 简介, widget: string, required: false }
       - { name: createdAt, label: 创建日期, widget: datetime, type: date, picker_utc: true }
       - { name: updatedAt, label: 更新日期, widget: datetime, type: date, picker_utc: true, required: false }
       - { name: tags, label: 标签, widget: list, required: false }
       - { name: draft, label: 是否草稿, widget: boolean, default: false }
       - { name: body, label: 正文, widget: markdown }
+
+  - name: columns
+    label: 栏目
+    label_singular: 栏目
+    folder: /src/content/columns
+    extension: yml
+    format: yml
+    create: true
+    # 文件名就是栏目网址（/columns/xxx），和文章一样手动填英文名
+    slug:
+      editable: true
+      hint: 英文小写，用 - 连接，例如 leetcode
+      pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', '只能包含小写字母、数字和 -']
+    fields:
+      - { name: title, label: 栏目名, widget: string }
+      - { name: description, label: 简介, widget: string, required: false }
