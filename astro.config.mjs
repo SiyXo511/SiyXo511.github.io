@@ -13,5 +13,12 @@ export default defineConfig({
       features: { math: true },
       mdastPlugins: [katexPlugin],
     }),
+    // 代码高亮同时生成浅色和深色两套颜色，由 CSS 根据当前主题选用哪一套
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    },
   },
 });

@@ -83,3 +83,37 @@ code {
   padding: 0.1em 0.35em;
   border-radius: 4px;
 }
+
+/* ========== 代码块 ==========
+   Shiki 给每段代码同时写了两套颜色：style 里的 color 是浅色主题，--shiki-dark 是深色主题
+   默认用浅色；深色主题下用下面的规则换成 --shiki-dark 那一套 */
+pre.astro-code {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* 代码块里的 <code> 不要再套用上面行内代码的底色和内边距 */
+pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+/* 深色的两种情况和颜色变量一样：系统深色且没手动选浅色，或者手动选了深色
+   要用 !important 是因为 Shiki 的颜色写在元素自己的 style 属性里，普通选择器的优先级比不过它 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}
+
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
