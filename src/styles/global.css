@@ -11,7 +11,8 @@
   --font-sans: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 
-  --content-width: 42rem;
+  /* 内容区最大宽度：太窄大屏上显得空，太宽一行字太多读起来累 */
+  --content-width: 70rem;
 
   color-scheme: light;
 }
