@@ -39,6 +39,9 @@ collections:
       - { name: tags, label: 标签, widget: list, required: false }
       - { name: draft, label: 是否草稿, widget: boolean, default: false }
       - { name: body, label: 正文, widget: markdown }
+    # 文章列表可以按栏目分组查看（列表上方的"分组"菜单）
+    view_groups:
+      - { label: 栏目, field: column }
 
   - name: columns
     label: 栏目
