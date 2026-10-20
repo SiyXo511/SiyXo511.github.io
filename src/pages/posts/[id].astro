@@ -21,7 +21,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, category, createdAt, updatedAt, tags } = post.data;
+const { title, category, column, createdAt, updatedAt, tags } = post.data;
 // 把 Markdown 正文编译成可以放进模板的组件
 const { Content } = await render(post);
 ---
@@ -29,7 +29,7 @@ const { Content } = await render(post);
 <BaseLayout title={title}>
   <article>
     <h1>{title}</h1>
-    <PostMeta category={category} createdAt={createdAt} updatedAt={updatedAt} tags={tags} />
+    <PostMeta category={category} column={column} createdAt={createdAt} updatedAt={updatedAt} tags={tags} />
     <Content />
   </article>
   <CodeCopy />

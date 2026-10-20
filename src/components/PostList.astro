@@ -18,6 +18,7 @@ const { posts } = Astro.props;
         {post.data.description && <p class="description">{post.data.description}</p>}
         <PostMeta
           category={post.data.category}
+          column={post.data.column}
           createdAt={post.data.createdAt}
           updatedAt={post.data.updatedAt}
           tags={post.data.tags}

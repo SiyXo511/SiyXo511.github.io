@@ -1,14 +1,25 @@
 ---
-// 文章元信息：[分类] 日期 · 更新日期 · 标签
+// 文章元信息：[分类] 栏目 日期 · 更新日期 · 标签
 // 列表页和详情页共用，保证两边格式一致
+import { getEntry, type CollectionEntry } from 'astro:content';
+import type { Post } from '../lib/posts';
+
 interface Props {
   category: string;
+  // 文章里的栏目引用，形如 { collection: 'columns', id: 'leetcode' }；没填栏目时是 undefined
+  column?: Post['data']['column'];
   createdAt: Date;
   updatedAt?: Date;
   tags?: string[];
 }
 
-const { category, createdAt, updatedAt, tags = [] } = Astro.props;
+const { category, column, createdAt, updatedAt, tags = [] } = Astro.props;
+
+// 引用里只有栏目的 id，显示中文名要去 columns 集合里把整个栏目取出来
+let columnEntry: CollectionEntry<'columns'> | undefined;
+if (column !== undefined) {
+  columnEntry = await getEntry(column);
+}
 
 // 把日期转成页面上显示的文字
 function formatDate(date: Date): string {
@@ -18,6 +29,7 @@ function formatDate(date: Date): string {
 
 <div class="meta">
   <span class="category">[{category}]</span>
+  {columnEntry && <a class="column" href={`/columns/${columnEntry.id}`}>{columnEntry.data.title}</a>}
   <time datetime={createdAt.toISOString()}>{formatDate(createdAt)}</time>
   {
     updatedAt && (
@@ -42,6 +54,19 @@ function formatDate(date: Date): string {
   .category {
     font-family: var(--font-mono);
     color: var(--color-accent);
+  }
+
+  /* 栏目：做成一个小标签，点击进入栏目页 */
+  .column {
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+  }
+
+  .column:hover {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    text-decoration: none;
   }
 
   time {
