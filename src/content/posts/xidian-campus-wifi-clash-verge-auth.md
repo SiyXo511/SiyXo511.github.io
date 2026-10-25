@@ -3,6 +3,7 @@ title: 西电校园网与 Clash Verge 认证故障排查及解决方案
 category: 笔记
 description: 保留代理和 TUN，通过定向分流、绑定 Wi-Fi 网卡及正确认证入口，解决西电校园网认证页面无法访问的问题。
 createdAt: 2026-10-25
+updatedAt: 2026-10-26
 tags:
   - 校园网
   - Clash Verge
@@ -188,17 +189,35 @@ Location: https://w.xidian.edu.cn/index_1.html
 - 联网检测的 `HTTP 200` 不等于已经能上网。本次返回的是认证跳转页面，而不是 Apple 正常的 `Success` 页面。
 - HTTPS 代理请求中的 `200 Connection established` 是代理隧道建立响应，不等于目标认证页面加载成功。后续 TLS 仍可能超时。
 
-## 6. 最终配置
+## 6. 在 Clash Verge 里怎么设置
 
-本次把配置保存在当前订阅的增强配置中，没有直接修改生成出来的运行时配置文件。这样可以避免常规订阅更新直接覆盖手工添加的内容。
+下面按 Clash Verge Rev 2.4.7 的界面操作。整个过程保持代理和 TUN 开启。
 
-下面展示经过验证的配置形式。应用前先确认 Wi-Fi 网卡名称；如果已有自定义内容，应合并对应条目，不能整份覆盖。
+先打开 Mac 的 **终端**，运行：
 
-**6.1 和 6.2 负责建立认证网站的访问路径；6.3 负责把专用出口限制在校园认证用途，不是打开页面的核心条件。** 三项配置保存生效后，还需要连接 `stu-xdwlan`，并访问本次验证的 `https://w.xidian.edu.cn/index_8.html`。本案例验证的是这套配置与正确入口的组合，不能理解成无论连接什么网络、使用哪个入口都能认证。
+```bash
+networksetup -listallhardwareports
+```
 
-### 6.1 添加认证专用直连出口
+找到 `Hardware Port: Wi-Fi`，看它下一行的 `Device`：
 
-在 Clash Verge 的 **订阅 → 右键当前订阅 → 编辑节点 → 高级** 中，添加：
+```text
+Hardware Port: Wi-Fi
+Device: en0
+```
+
+这表示 Wi-Fi 网卡叫 `en0`。如果你的电脑显示的是 `en1`，就把下面配置里的 `interface-name: en0` 改为 `interface-name: en1`。
+
+接下来打开 Clash Verge 左侧的 **订阅**。下面三步都在**正在使用的那张订阅卡片**上右键操作。每次修改前，先把编辑框里的原文复制到文本文件里留一份。
+
+### 6.1 添加一个从 Wi-Fi 直连的选项
+
+这一步告诉 Clash：新增一个叫 `Campus-Auth-WiFi` 的连接方式，直接从 Wi-Fi 访问网站。
+
+1. 右键正在使用的订阅，点击 **编辑节点**。
+2. 切换到 **高级**。
+3. 如果编辑框里只有 `prepend: []`、`append: []`、`delete: []` 这三项空列表，用下面的完整内容替换。
+4. 检查 `interface-name` 是否与你刚才查到的网卡名称一致，然后点击 **保存**。
 
 ```yaml
 prepend:
@@ -210,18 +229,24 @@ append: []
 delete: []
 ```
 
-各字段的作用是：
+这里的 `direct` 表示不经过远端代理服务器，`ipv4` 表示使用 IPv4。`Campus-Auth-WiFi` 是自己起的名字，下一步会用到它。
 
-- `Campus-Auth-WiFi` 是规则引用的名称，不是新的远端代理服务器。
-- `type: direct` 表示直接连接目标。
-- `ip-version: ipv4` 让这个出口使用 IPv4，与本次已经验证的校园认证访问方式一致。
-- `interface-name: en0` 明确绑定本机 Wi-Fi 网卡。
+**如果编辑框里已经有自己添加的节点：** 保留它们。找到 `prepend:`，把下面四行放在它下面、原有节点前面；原有的 `append` 和 `delete` 也保留。不要再写第二个 `prepend:`。如果原来写的是 `prepend: []`，先把它改成 `prepend:`。
 
-这里没有写死设备的校园网地址，也没有写死认证服务器的 IP。设备地址可以随 DHCP 分配变化，认证网站仍通过域名访问。固定服务器 IP 只用于排查时的对照探测。
+```yaml
+  - name: Campus-Auth-WiFi
+    type: direct
+    ip-version: ipv4
+    interface-name: en0
+```
 
-### 6.2 只替换认证域名的规则目标
+### 6.2 让校园认证网站使用它
 
-在 **订阅 → 右键当前订阅 → 编辑规则 → 高级** 中，当前配置为：
+上一步只是添加了连接方式，这一步才指定哪些网站使用它。
+
+1. 再次右键同一张订阅卡片，点击 **编辑规则**。
+2. 切换到 **高级**。
+3. 如果三个列表都是空的，用下面的完整内容替换，然后点击 **保存**。
 
 ```yaml
 prepend:
@@ -231,37 +256,68 @@ append: []
 delete: []
 ```
 
-`DOMAIN` 匹配完整域名。对 `w.xidian.edu.cn` 而言，`index_8.html`、其他路径以及同域名请求都会命中这项规则，其他域名不会匹配它。
+第一条让 Mac 的联网检测地址直连。第二条让校园认证网站使用刚才添加的 `Campus-Auth-WiFi`。
 
-规则放在前面，是为了先于原订阅中的通用规则生效。没有把整个 `xidian.edu.cn`、全部私网地址或所有 Apple 服务一起改到这个出口。
+**如果这里已经有规则：** 把上面两条 `DOMAIN` 规则放到现有 `prepend:` 列表的最前面，保留其他域名的规则以及原有的 `append`、`delete`。如果已经添加过这两个域名的规则，直接改成上面的写法，不要重复添加。例如，原来的 `DOMAIN,w.xidian.edu.cn,DIRECT` 要改成 `DOMAIN,w.xidian.edu.cn,Campus-Auth-WiFi`。
 
-### 6.3 防止专用直连出口进入普通代理组
+### 6.3 把这个选项从普通节点列表里拿掉
 
-添加节点后，检查生成的配置发现，Clash Verge 自动把 `Campus-Auth-WiFi` 加入了普通 `Proxy` 组的候选列表。
+添加完 6.1 后，Clash Verge 可能会把 `Campus-Auth-WiFi` 放进平时选择代理节点的列表。它是直连选项；如果以后在普通代理组里选中它，经过这个组的流量也会变成直连。
 
-这次保存没有切换当前选中节点，但留下这个候选项会扩大它的可选范围。为符合“只供校园认证使用”的要求，在当前订阅的 **扩展脚本** 中增加了过滤：
+下面的脚本会把它从这些列表里拿掉。6.2 的校园认证规则仍然能使用它。
+
+1. 右键同一张订阅卡片，点击 **扩展脚本**。不要打开页面底部的 **全局扩展脚本**。
+2. 如果你从未改过这里，看到的默认内容通常是下面这样，可能还带有注释：
 
 ```javascript
 function main(config) {
-  // Keep the campus-only direct outbound out of normal proxy selectors.
+  return config;
+}
+```
+
+3. 把默认内容全部替换成下面这份完整脚本，然后点击 **保存**：
+
+```javascript
+function main(config) {
+  // 从普通节点列表中移除校园网直连选项。
   for (const group of config["proxy-groups"] || []) {
     if (Array.isArray(group.proxies)) {
-      group.proxies = group.proxies.filter(name => name !== "Campus-Auth-WiFi");
+      group.proxies = group.proxies.filter(
+        name => name !== "Campus-Auth-WiFi"
+      );
     }
   }
   return config;
 }
 ```
 
-这个脚本只移除代理组候选列表中的同名项，不删除专用出口本身。认证规则仍然可以直接引用它。
+**如果这里已有你自己的脚本，且最后通过 `return config;` 返回配置：** 不要整份替换，也不要添加第二个 `main` 函数。找到 `main` 函数末尾的 `return config;`，把下面这段放在它的**上一行**，然后保存。这样会先执行你原来的修改，最后再从节点列表里移除校园网直连选项。
 
-如果当前订阅的扩展脚本已有其他逻辑，应保留原逻辑并合并过滤部分，不要直接覆盖。
+```javascript
+  for (const group of config["proxy-groups"] || []) {
+    if (Array.isArray(group.proxies)) {
+      group.proxies = group.proxies.filter(
+        name => name !== "Campus-Auth-WiFi"
+      );
+    }
+  }
+```
 
-### 6.4 配置保存与订阅更新
+如果你的脚本没有 `return config;`，或有多个提前返回的位置，这个插入方法就不适用，需要先按实际脚本调整。上面的完整替换版适用于默认脚本。
 
-通过当前订阅的 **编辑节点**、**编辑规则** 和 **扩展脚本** 保存上述内容，后续也优先从这些入口维护。不要直接编辑自动生成的运行时配置。
+### 6.4 保存后打开认证页面
 
-这些修改作用于当前订阅。切换其他订阅时，需要重新核对它是否带有相同配置。
+三处都保存后，回到 **订阅** 页面，点击顶部的 **重新激活订阅**，让 Clash 重新加载刚才的设置。
+
+然后连接校园 Wi-Fi `stu-xdwlan`，在浏览器里打开：
+
+[https://w.xidian.edu.cn/index_8.html](https://w.xidian.edu.cn/index_8.html)
+
+出现登录页后，按学校页面的要求完成认证，不需要等系统自动弹窗。
+
+如果仍打不开，打开 Clash Verge 的 **规则** 页面，搜索 `w.xidian.edu.cn`，确认对应的目标是 `Campus-Auth-WiFi`。如果还是 `DIRECT`，先回到 6.2 检查是否保存了规则，并重新激活订阅。
+
+以上设置保存在刚才选中的订阅里。以后切换到另一份订阅时，需要在那份订阅里重新设置。
 
 ## 7. 配置与认证结果怎样验证
 
